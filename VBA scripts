@@ -1,0 +1,131 @@
+Attribute VB_Name = "Module1"
+Sub Easy()
+'Declaring Variables
+    Dim Col  As Double
+    Dim Total_Vol As Double
+ 
+' Adding Headings
+    Cells(1, 9).Value = "Ticker"
+    Cells(1, 10).Value = "Total Stock Volume"
+
+    Col = 2
+    Cells(Col, 9).Value = Cells(Col, 1).Value
+
+    LastRow = Cells(Rows.Count, 1).End(xlUp).Row
+
+    For Row = 2 To LastRow
+
+    If Cells(Row, 1).Value = Cells(Col, 9) Then
+    
+     
+     Total_Volume = Total_Volume + Cells(Row, 7).Value
+     
+     Else
+     
+     Cells(Col, 10).Value = Total_Volume
+     Total_Volume = Cells(Row, 7).Value
+     Col = Col + 1
+     Cells(Col, 9).Value = Cells(Row, 1).Value
+     End If
+     
+     Next Row
+     
+     Cells(Col, 10).Value = Total_Volume
+     
+End Sub
+
+Sub Moderate()
+
+'Looping through all the sheets
+Dim WS As Worksheet
+    For Each WS In ActiveWorkbook.Worksheets
+    WS.Activate
+        ' Determine the Last Row
+        LastRow = WS.Cells(Rows.Count, 1).End(xlUp).Row
+
+        'Add Headings
+        Cells(1, "I").Value = "Ticker"
+        Cells(1, "J").Value = "Yearly Change"
+        Cells(1, "K").Value = "Percent Change"
+        Cells(1, "L").Value = "Total Stock Volume"
+        
+        'Create Variables for the Values
+        Dim Open_Price As Double
+        Dim Close_Price As Double
+        Dim Yearly_Change As Double
+        Dim Ticker_Name As String
+        Dim Percent_Change As Double
+        Dim Volume As Double
+        Dim Row As Double
+        Dim Col As Integer
+        Dim i As Long
+        
+        Volume = 0
+        Row = 2
+        Col = 1
+        
+        'Set Initial Open Price
+        Open_Price = Cells(2, Col + 2).Value
+         
+         
+         ' Loop through all ticker symbols
+           For i = 2 To LastRow
+           
+         ' Check to see if within the same ticker symbol
+            If Cells(i + 1, Col).Value <> Cells(i, Col).Value Then
+                ' Set Ticker name
+                Ticker_Name = Cells(i, Col).Value
+                Cells(Row, Col + 8).Value = Ticker_Name
+                ' Set Close Price
+                Close_Price = Cells(i, Col + 5).Value
+                ' Add Yearly Change
+                Yearly_Change = Close_Price - Open_Price
+                Cells(Row, Col + 9).Value = Yearly_Change
+                ' Add Percent Change
+                If (Open_Price = 0 And Close_Price = 0) Then
+                    Percent_Change = 0
+                ElseIf (Open_Price = 0 And Close_Price <> 0) Then
+                    Percent_Change = 1
+                Else
+                    Percent_Change = Yearly_Change / Open_Price
+                    Cells(Row, Col + 10).Value = Percent_Change
+                    Cells(Row, Col + 10).NumberFormat = "0.00%"
+                End If
+                ' Add Total Volume
+                Volume = Volume + Cells(i, Col + 6).Value
+                Cells(Row, Col + 11).Value = Volume
+                ' Add one to the summary table row
+                Row = Row + 1
+                ' reset the Open Price
+                Open_Price = Cells(i + 1, Col + 2)
+                ' reset the Volume Total
+                Volume = 0
+            'if cells are the same ticker
+            Else
+                Volume = Volume + Cells(i, Col + 6).Value
+            End If
+        Next i
+        
+        ' Determine the Last Row of Yearly Change per WS
+        YCLastRow = WS.Cells(Rows.Count, Column + 8).End(xlUp).Row
+        ' Set the Cell Colors
+        For j = 2 To YCLastRow
+            If (Cells(j, Col + 9).Value > 0 Or Cells(j, Col + 9).Value = 0) Then
+                Cells(j, Col + 9).Interior.ColorIndex = 10
+            ElseIf Cells(j, Col + 9).Value < 0 Then
+                Cells(j, Col + 9).Interior.ColorIndex = 3
+            End If
+        Next j
+       
+    
+        
+    Next WS
+
+End Sub
+
+
+
+
+
+     
+
